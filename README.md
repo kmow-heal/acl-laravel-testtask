@@ -18,13 +18,21 @@ This is a sample control access list application on Laravel.
    git clone https://github.com/kmow-heal/acl-laravel-testtask.git
    cd acl-laravel-testtask
 
-2. Start project with Docker:
+2. For start copy file `.env.example` as `.env`. You need change value 
+
+    ```bash
+    DB_USERNAME=you_user
+    DB_PASSWORD=you_password
+
+    Where `you_user` username which created and `you_password` is password for this user. Olso this password used as root password
+
+3. Start project with Docker:
 
     ```bash
     cd project_path/acl-laravel-testtask
     docker-compose -d
 
-3. Add some fake information to database:
+4. Add some fake information to database:
 
     ```bash
     docker exec acl-app php artisan migrate:refresh --seed
