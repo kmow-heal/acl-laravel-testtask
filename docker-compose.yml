@@ -1,0 +1,65 @@
+version: "3.8"
+services:
+  app:
+    build:
+      args:
+        user: user
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image: acl-laravel
+    container_name: acl-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    command: >
+      sh -c "
+        composer install;
+        php artisan migrate --force && php-fpm
+      "
+    volumes:
+      - ./:/var/www
+    networks:
+      - acl
+
+  db:
+    image: mysql:8.0
+    container_name: acl-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - ./docker-compose/mysql:/var/lib/mysql
+    networks:
+      - acl
+
+  nginx:
+    image: nginx:alpine
+    container_name: acl-nginx
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    volumes:
+      - ./:/var/www
+      - ./docker-compose/nginx:/etc/nginx/conf.d/
+    networks:
+      - acl
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: acl-pma
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    restart: always
+    ports:
+      - 8080:80
+    networks:
+      - acl
+
+networks:
+  acl:
+    driver: bridge
